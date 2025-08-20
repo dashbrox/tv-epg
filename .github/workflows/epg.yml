@@ -1,0 +1,28 @@
+name: Build EPG
+
+on:
+  schedule:
+    - cron: "0 */12 * * *" # cada 12 horas
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install epg-grabber -g
+      - run: |
+          npx epg-grabber \
+            --config=sites/mi.tv/mi.tv.config.js \
+            --channels=sites/mi.tv/mi.tv_mx.channels.xml \
+            --output=guide.xml \
+            --days=2
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
