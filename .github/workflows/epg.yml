@@ -19,17 +19,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install cheerio
+          npm install cheerio dayjs
 
       - name: Run epg-grabber
         run: |
           npx epg-grabber --config=epg.config.js --output=guide.xml
+          gzip -c guide.xml > guide.xml.gz
 
-      - name: Upload guide.xml
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: guide
-          path: guide.xml
+          name: epg-guides
+          path: |
+            guide.xml
+            guide.xml.gz
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
